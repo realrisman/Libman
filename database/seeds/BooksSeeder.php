@@ -3,6 +3,8 @@
 use Illuminate\Database\Seeder;
 use App\Author;
 use App\Book;
+use App\BorrowLog;
+use App\User;
 
 class BooksSeeder extends Seeder
 {
@@ -13,12 +15,12 @@ class BooksSeeder extends Seeder
      */
     public function run()
     {
-        // Sample penulis
+        // Author Sample
         $author1 = Author::create(['name'=>'Mohammad Fauzil Adhim']);
         $author2 = Author::create(['name'=>'Salim A. Fillah']);
         $author3 = Author::create(['name'=>'Aam Amiruddin']);
 
-        // Sample buku
+        // Book Sample
         $book1 = Book::create(
             [
                 'title'=>'Kupinang Engkau dengan Hamdalah',
@@ -47,5 +49,23 @@ class BooksSeeder extends Seeder
                 'author_id'=>$author3->id
             ]
         );
+
+        // Borrow Sample
+        $member = User::where('email', 'member@gmail.com')->first();
+        BorrowLog::create([
+            'user_id' => $member->id,
+            'book_id' => $book1->id,
+            'is_returned' => 0
+        ]);
+        BorrowLog::create([
+            'user_id' => $member->id,
+            'book_id' => $book2->id,
+            'is_returned' => 0
+        ]);
+        BorrowLog::create([
+            'user_id' => $member->id,
+            'book_id' => $book3->id,
+            'is_returned' => 1
+        ]);
     }
 }
