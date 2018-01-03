@@ -7,6 +7,10 @@ use Yajra\Datatables\Html\Builder;
 use Yajra\Datatables\Datatables;
 use App\Book;
 use Laratrust\LaratrustFacade as Laratrust;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\BorrowLog;
+use Illuminate\Support\Facades\Auth;
+use Session;
 
 class GuestController extends Controller
 {
@@ -19,7 +23,7 @@ class GuestController extends Controller
                     if (Laratrust::hasRole('admin')) {
                         return '';
                     }
-                    return '<a class="btn btn-xs btn-primary" href="#">Borrow</a>';
+                    return '<a class="btn btn-xs btn-primary" href="'.route('guest.books.borrow', $book->id).'">Borrow</a>';
                 })->make(true);
         }
 
@@ -43,5 +47,28 @@ class GuestController extends Controller
         ]);
 
         return view('guest.index')->with(compact('html'));
+    }
+
+    public function borrow($id)
+    {
+        try {
+            $book = Book::findOrFail($id);
+            BorrowLog::create([
+                'user_id' => Auth::user()->id,
+                'book_id' => $id
+            ]);
+
+            Session::flash("flash_notification", [
+                "level"=>"success",
+                "message"=>"Succesfully borrow the $book->title"
+            ]);
+        } catch (ModelNotFoundException $e) {
+            Session::flash("flash_notification", [
+                "level"=>"danger",
+                "message"=>"Book not found."
+            ]);
+        }
+
+        return redirect('/');
     }
 }

@@ -21,3 +21,9 @@ Route::group(['prefix'=>'admin', 'middleware'=>['auth', 'role:admin']], function
     Route::resource('authors', 'AuthorsController');
     Route::resource('books', 'BooksController');
 });
+
+Route::get('books/{book}/borrow', [
+    'middleware' => ['auth', 'role:member'],
+    'as' => 'guest.books.borrow',
+    'uses' => 'GuestController@borrow'
+]);
